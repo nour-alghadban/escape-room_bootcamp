@@ -1453,6 +1453,15 @@ def show_access():
         ).pack(
             pady=15
         )
+        tk.Button(
+            scrollable_frame,
+            text="RETURN TO MAIN TERMINAL",
+            command=show_home,
+            font=FONT_BOLD,
+            width=28
+        ).pack(
+            pady=30
+        )        
 # ==================================================
 # STAGE 3 — PYTHON CHALLENGE
 # ==================================================
