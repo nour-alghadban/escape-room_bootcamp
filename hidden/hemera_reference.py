@@ -1,13 +1,13 @@
 profile_A = [
-    "AG", "CC", "TG", "AA", "CT",
-    "GG", "TT", "AC", "CG", "GA",
-    "CC", "AT", "TG", "GG", "AC",
-    "CT", "AA", "GC", "TT", "CG"
+    "T", "C", "G", "G", "G",
+    "A", "A", "T", "G", "G",
+    "C", "C", "G", "G", "T",
+    "G", "G", "C", "T", "A"
 ]
 
 profile_B = [
-    "AG", "CC", "TG", "AT", "CT",
-    "GG", "TC", "AC", "CG", "GA",
-    "CT", "AT", "TG", "AG", "AC",
-    "CT", "AA", "GC", "TC", "CG"
+    "T", "C", "G", "A", "G",
+    "A", "A", "T", "A", "G",
+    "C", "C", "G", "A", "T",
+    "G", "G", "A", "T", "A"
 ]

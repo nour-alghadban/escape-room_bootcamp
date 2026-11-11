@@ -5,6 +5,7 @@ from PIL import Image, ImageTk
 
 import re
 import shutil
+import platform
 import subprocess
 
 # ==================================================
@@ -47,8 +48,16 @@ from protein_reference import (
  
 # !Set a full path here if PyMOL is not on your system PATH
 # e.g. r"C:\Program Files\PyMOL\PyMOLWin.exe"
-PYMOL_PATH = "/Applications/PyMOL.app/Contents/MacOS/PyMOL"
- 
+
+if platform.system() == "Darwin":
+    PYMOL_PATH = "/Applications/PyMOL.app/Contents/MacOS/PyMOL"
+
+elif platform.system() == "Windows":
+    PYMOL_PATH = r"C:\Users\MEPI\AppData\Local\Schrodinger\PyMOL2\Menu\PyMOL + Console.bat"
+
+else:
+    PYMOL_PATH = None
+
 MAX_PRIMER_ATTEMPTS = 4          # "four attempts maximum"
 ALLOW_RETRY_AFTER_LOCKOUT = True # after 4 failures, offer a restart of page 2
  
@@ -89,6 +98,13 @@ B_matches = 0
 selected_chain = None        # chain letter the player chose, e.g. "A"
 selected_chain_type = None   # "alpha" or "beta"
 verified_cds = None
+oracle_unlocked = False
+MARKER_POSITIONS = [
+    10, 32, 54, 76, 98,
+    120, 142, 164, 186, 208,
+    231, 253, 275, 297, 319,
+    341, 363, 385, 407, 430
+]
 
 # ==================================================
 # SCROLLABLE AREA
@@ -218,12 +234,56 @@ def scroll_to_bottom():
 
     main_canvas.yview_moveto(1.0)
 
+#HOMEPAGE FUNCTION
+def show_home():
 
+    clear_screen()
 
+    title(
+        "PROFESSOR X // INVESTIGATION TERMINAL",
+        "Select an investigation module"
+    )
+
+    tk.Button(
+        scrollable_frame,
+        text="BEGIN MOLECULAR ANALYSIS",
+        command=show_protein_lookup,
+        font=FONT_BOLD,
+        width=30
+    ).pack(
+        pady=(60, 15)
+    )
+
+    oracle_button = tk.Button(
+        scrollable_frame,
+        text="ACCESS ORACLE",
+        command=show_access,
+        font=FONT_BOLD,
+        width=30
+    )
+
+    oracle_button.pack(
+        pady=15
+    )
+
+    if not oracle_unlocked:
+
+        oracle_button.config(
+            state="disabled"
+        )
+
+        tk.Label(
+            scrollable_frame,
+            text="ORACLE ACCESS LOCKED\nComplete molecular analysis first.",
+            font=FONT
+        ).pack(
+            pady=5
+        )
 # ==================================================
 # >>> NEW: PRE-STAGE HELPER FUNCTIONS
 # ==================================================
  
+
 def launch_pymol(session_file):
     """Open the local PyMOL session in its own window. Returns an error string or None."""
  
@@ -1142,11 +1202,12 @@ def show_pcr_success():
         cds_display.config(state="disabled")
         cds_display.pack(pady=5)
 
-
+        global oracle_unlocked
+        oracle_unlocked = True
         tk.Button(
             scrollable_frame,
-            text="CONTINUE TO ORACLE ACCESS",
-            command=show_access,
+            text="RETURN TO MAIN TERMINAL",
+            command=show_home,
             font=FONT_BOLD,
             width=28
         ).pack(
@@ -1246,125 +1307,152 @@ def show_access():
 # STAGE 2 — CRIME-SCENE PROFILE INPUT
 # ==================================================
 
-def show_profile_input():
-
-    clear_screen()
-
-    title(
-        "CRIME-SCENE PROFILE",
-        "INPUT REQUIRED"
-    )
 
 
-    tk.Label(
-        scrollable_frame,
-        text=(
-            "Use NYX to recover the \n"
-            "the genetic profile of the biological trace found\n"
-            "in Professor X's laboratory.\n\n"
-            "Enter that profile below."
-        ),
-        font=FONT,
-        justify="center"
-    ).pack(
-        pady=20
-    )
+    def show_profile_input():
 
+        clear_screen()
 
-    tk.Label(
-        scrollable_frame,
-        text="Enter the 20 markers separated by spaces:",
-        font=FONT_BOLD
-    ).pack(
-        pady=10
-    )
-
-
-    profile_entry = tk.Entry(
-        scrollable_frame,
-        width=75,
-        font=("Courier New", 12),
-        justify="center"
-    )
-
-    profile_entry.pack(
-        pady=10
-    )
-
-
-    tk.Label(
-        scrollable_frame,
-        text=(
-            "Example format:\n"
-            "AG CC TG AA CT GG TT AC CG GA "
-            "CC AT TG GG AC CT AA GC TT CG"
-        ),
-        font=("Courier New", 10),
-        justify="center"
-    ).pack(
-        pady=5
-    )
-
-
-    status = tk.Label(
-        scrollable_frame,
-        text="",
-        font=FONT
-    )
-
-    status.pack(
-        pady=10
-    )
-
-
-    def submit_profile():
-
-        global crime_sample
-
-        crime_sample = (
-            profile_entry
-            .get()
-            .strip()
-            .upper()
-            .split()
+        title(
+            "CRIME-SCENE PROFILE",
+            "INPUT REQUIRED"
         )
 
+        tk.Label(
+            scrollable_frame,
+            text=(
+                "Use NYX to recover the genetic information from the\n"
+                "biological trace found in Professor X's laboratory.\n\n"
+                "Paste the complete DNA sequence recovered from the previous analysis."
+            ),
+            font=FONT,
+            justify="center"
+        ).pack(
+            pady=20
+        )
 
-        if len(crime_sample) != 20:
+        tk.Label(
+            scrollable_frame,
+            text="Paste the complete DNA sequence below:",
+            font=FONT_BOLD
+        ).pack(
+            pady=10
+        )
+
+        profile_entry = tk.Entry(
+            scrollable_frame,
+            width=95,
+            font=("Courier New", 12),
+            justify="left"
+        )
+
+        profile_entry.pack(
+            pady=10,
+            padx=20
+        )
+
+        tk.Label(
+            scrollable_frame,
+            text=(
+                "Paste the complete nucleotide sequence.\n"
+                "ORACLE will automatically extract the predefined\n"
+                "identification markers required for comparison."
+            ),
+            font=("Courier New", 10),
+            justify="center"
+        ).pack(
+            pady=5
+        )
+
+        status = tk.Label(
+            scrollable_frame,
+            text="",
+            font=FONT,
+            justify="center"
+        )
+
+        status.pack(
+            pady=10
+        )
+
+        def submit_profile():
+
+            global crime_sample
+
+            # Read the full sequence typed/pasted by the player
+            full_sequence = clean_dna(
+                profile_entry.get()
+            )
+
+            # Nothing entered
+            if not full_sequence:
+
+                status.config(
+                    text=(
+                        "ERROR:\n"
+                        "Paste the DNA sequence first."
+                    )
+                )
+
+                return
+
+            # Make sure sequence contains only DNA bases
+            if set(full_sequence) - set("ACGT"):
+
+                status.config(
+                    text=(
+                        "ERROR:\n"
+                        "The sequence must contain only A, C, G and T."
+                    )
+                )
+
+                return
+
+            # Make sure the sequence is long enough
+            # because the largest marker index is 430
+            if len(full_sequence) <= max(MARKER_POSITIONS):
+
+                status.config(
+                    text=(
+                        "ERROR:\n"
+                        "The submitted DNA sequence is incomplete.\n"
+                        f"Sequence length detected: {len(full_sequence)} nucleotides."
+                    )
+                )
+
+                return
+
+            # Extract the 20 selected marker positions
+            crime_sample = [
+                full_sequence[i]
+                for i in MARKER_POSITIONS
+            ]
 
             status.config(
                 text=(
-                    "ERROR:\n"
-                    "ORACLE expects exactly "
-                    "20 genetic markers."
+                    "SEQUENCE ACCEPTED\n"
+                    "20 identification markers extracted."
                 )
             )
 
-            return
+            root.after(
+                1000,
+                show_code_challenge
+            )
 
 
-        status.config(
-            text="PROFILE ACCEPTED"
+        # IMPORTANT:
+        # command=submit_profile
+        # NOT command=submit_profile()
+        tk.Button(
+            scrollable_frame,
+            text="LOAD SEQUENCE",
+            command=submit_profile,
+            font=FONT_BOLD,
+            width=20
+        ).pack(
+            pady=15
         )
-
-
-        root.after(
-            1000,
-            show_code_challenge
-        )
-
-
-    tk.Button(
-        scrollable_frame,
-        text="LOAD PROFILE",
-        command=submit_profile,
-        font=FONT_BOLD,
-        width=20
-    ).pack(
-        pady=15
-    )
-
-
 # ==================================================
 # STAGE 3 — PYTHON CHALLENGE
 # ==================================================
@@ -2246,7 +2334,7 @@ def show_identity():
 # ==================================================
 
 
-show_protein_lookup()
+show_home()
 #show_access()
 
 root.mainloop()
