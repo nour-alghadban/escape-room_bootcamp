@@ -548,7 +548,7 @@ def show_protein_lookup():
         status.config(
             text=(
                 "HINT: haemoglobin has two alpha and two beta chains.\n"
-                "In PyMOL, use Display > Sequence to read each chain."
+                "In PyMOL, use Display > Sequence to read each chain.\n"
             )
         )
  
@@ -713,7 +713,9 @@ def show_protein_lookup():
 # ==================================================
 # >>> NEW: PRE-STAGE 1 — PAGE 2: MOLECULAR ANALYSIS
 # ==================================================
- 
+
+
+
 def show_molecular_analysis():
  
     global primer_attempts
@@ -759,7 +761,8 @@ def show_molecular_analysis():
     ).pack(
         anchor="w"
     )
- 
+
+
  
     global sequence_box, status1, cds_label, cds_box, verify_button
     global forward_entry, reverse_entry, primer_button, attempts_label, status2
@@ -793,6 +796,16 @@ def show_molecular_analysis():
         width=24
     )
     verify_button.pack(pady=5)
+
+    tk.Button(
+        tool1_frame,
+        text="SHOW HINT",
+        command=show_hint_pymol,
+        font=FONT,
+        width=28
+    ).pack(
+        pady=(5, 30)
+    )
  
     cds_label = tk.Label(
         tool1_frame,
@@ -987,7 +1000,15 @@ def show_molecular_analysis():
         pady=5,
         anchor="w"
     )
- 
+
+def show_hint_pymol():
+
+    status1.config(
+        text=(
+            "HINT: Use print(cmd.get_fastastr('all')) to acquire protein sequence"
+        )
+    )
+
 
 def verify_sequence():
  
@@ -1183,12 +1204,13 @@ def show_pcr_success():
             text=(
                 "Correct primers accepted.\n"
                 "DNA amplification confirmed in the\n"
-                "educational simulation.\n\n"
+                "PCR .\n\n"
                 f"Forward primer: {primer_result['forward']}"
                 f"  (Tm {primer_result['tm_f']:.1f} C)\n"
                 f"Reverse primer: {primer_result['reverse']}"
                 f"  (Tm {primer_result['tm_r']:.1f} C)\n"
-                f"Amplicon size: {primer_result['amplicon']} bp"
+                f"Amplicon size: {primer_result['amplicon']}bp\n"
+                f"Keep a record of the sample's sequence"
             )
         )
 
