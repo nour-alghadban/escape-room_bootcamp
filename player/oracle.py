@@ -1265,6 +1265,18 @@ def show_access():
         pady=(60, 10)
     )
 
+    tk.Label(
+        scrollable_frame,
+        text=(
+            "ACCESS FORMAT:\n"
+            "[GENE]-[CODE]"
+        ),
+        font=FONT,
+        justify="center"
+    ).pack(
+        pady=(0, 15)
+    )
+
 
     access_entry = tk.Entry(
         scrollable_frame,
